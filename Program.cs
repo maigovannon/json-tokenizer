@@ -4,6 +4,10 @@ using System.IO;
 namespace JSONTokenizer {
    class Program {
       static void Main (string[] args) {
+         if (args.Length < 1 || !File.Exists (args[0])) {
+            Console.WriteLine ("File does not exist/not provided");
+            return;
+         }
          var text = File.ReadAllText (args[0]);//.Replace ("\r\n", "\n");
          var tokenizer = new Tokenizer (text);
          for (;;) {
