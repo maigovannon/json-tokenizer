@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 
 namespace JSONTokenizer {
-
    public class Token {
+      public Token (E kind, object value) { Kind = kind; Value = value; }
+
       public enum E {
          Punctuation,
          String,
@@ -11,16 +12,13 @@ namespace JSONTokenizer {
          Keyword,
          Invalid,
       }
-      public Token(E kind, object value) { Kind = kind;  Value = value; }
 
-      public override string ToString () {
-         return $"{Kind.ToString ().PadRight (StrLen)}: {Value}";
-      }
+      public override string ToString () => $"{Kind.ToString ().PadRight (StrLen)}: {Value}";
 
       public static readonly int StrLen = E.Punctuation.ToString ().Length;
 
-      public E Kind;
-      public object Value;
+      public readonly E Kind;
+      public readonly object Value;
    }
 
    public static class Extensions {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using E = JSONTokenizer.Token.E;
+
 namespace JSONTokenizer {
 
    public class Tokenizer {
@@ -12,27 +13,28 @@ namespace JSONTokenizer {
          mDict = new Dictionary<E, int> ();
          (Enum.GetValues (typeof (E)) as E[]).ForEach (e => mDict.Add (e, 0));
       }
-
+      
+      /// <summary>Get the next token</summary>
       public Token Next () {
          if (++mIdx >= mText.Length) return null;
          var token = GetToken (); mDict[token.Kind]++;
          return token.Kind == E.Invalid ? Next () : token;
       }
 
+      /// <summary>Helper method to get the next token</summary>
       Token GetToken () {
          while (Skip.Any (s => s == mText[mIdx])) {
             if (++mIdx >= mText.Length) return null;
          }
 
-         var c = mText[mIdx];
          // Punc
-         if (Punctuations.Any (p => p == c)) return new Token (E.Punctuation, $"'{c}'");
+         if (Punctuations.Any (p => p == mText[mIdx])) return new Token (E.Punctuation, $"'{mText[mIdx]}'");
 
          // String
-         string str = GetString (); if (str != null) return new Token (E.String, $"\"{str}\"");
+         var str = GetString (); if (str != null) return new Token (E.String, $"\"{str}\"");
 
          // Number 
-         string num = GetNumberString (); if (num != null) return new Token (E.Number, num);
+         var num = GetNumberString (); if (num != null) return new Token (E.Number, num);
 
          // Keyword
          int end = mText.IndexOfAny (Delims, mIdx); if (end == -1) return null;
@@ -63,13 +65,13 @@ namespace JSONTokenizer {
             for (int j = mIdx - 1; j > c && mText[j] == '\\'; j++) escaped = !escaped;
 
             if (!escaped) break; // This is not an escaped '"'. End the loop
-            c = mIdx;
+            c = mIdx++;
          }
          return mText.Substring (st, mIdx - st);
       }
 
       string GetNumberString () {
-         var i = mText.IndexOfAny (Punctuations, mIdx); if (i == -1) return null;
+         var i = mText.IndexOfAny (Delims, mIdx); if (i == -1) return null;
          var s = mText.Substring (mIdx, i - mIdx);
          double v;
          if (double.TryParse (s, out v)) { mIdx = i - 1; return s; }
@@ -80,7 +82,6 @@ namespace JSONTokenizer {
       Dictionary<E, int> mDict;
 
       static readonly string[] Keywords = { "true", "false", "null" };
-
       static readonly char[] Punctuations = { '{', '}', '[', ']', ':', ',' };
       static readonly char[] Skip = { '\r', '\n', ' ', '\t' };
       static readonly char[] Delims = Punctuations.Concat (Skip).ToArray ();

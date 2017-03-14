@@ -4,8 +4,8 @@ using System.IO;
 namespace JSONTokenizer {
    class Program {
       static void Main (string[] args) {
-         args[0] = @"C:\mm\CS17\002\TrumpfBendingTools.tools";
-         var text = File.ReadAllText (args[0]).Replace ("\r\n", "\n");
+         args[0] = @"C:\mm\CS17\002\customerbenddeductions.deductions";
+         var text = File.ReadAllText (args[0]);//.Replace ("\r\n", "\n");
          var tokenizer = new Tokenizer (text);
          for (;;) {
             var token = tokenizer.Next ();
