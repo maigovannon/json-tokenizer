@@ -7,7 +7,7 @@ namespace JSONTokenizer {
 
    public class Tokenizer {
       public Tokenizer (string text) {
-         mText = " " + text;
+         mText = " " + text; // Append a WS to safe use mIdx - 1
          mIdx = 0;
 
          mDict = new Dictionary<E, int> ();
@@ -17,7 +17,8 @@ namespace JSONTokenizer {
       /// <summary>Get the next token</summary>
       public Token Next () {
          if (++mIdx >= mText.Length) return null;
-         var token = GetToken (); mDict[token.Kind]++;
+         var token = GetToken (); if (token == null) return null;
+         mDict[token.Kind]++;
          return token.Kind == E.Invalid ? Next () : token;
       }
 
@@ -45,31 +46,34 @@ namespace JSONTokenizer {
          InvalidToken (str); return new Token (E.Invalid, str);
       }
 
-      void InvalidToken (string err) {
+      /// <summary>Log a message for an invalid token</summary>
+      void InvalidToken (string token) {
          Console.ForegroundColor = ConsoleColor.Red;
-         Console.WriteLine ($"Invalid token found:{err}");
+         Console.WriteLine ($"Invalid token found: {token}");
          Console.ForegroundColor = ConsoleColor.Gray;
       }
 
+      /// <summary>Get the next string from the file, if it exists </summary>
       string GetString () {
          if (mText[mIdx] != '"' || mText[mIdx - 1] == '\\') return null;
 
-         int c = mIdx;
-         int st = ++mIdx;
+         var k = mIdx; // The sentinel index for the next search
+         var st = ++mIdx;
          // Find the closing quote
          while (true) {
             while (mIdx < mText.Length && mText[mIdx] != '"') ++mIdx;
             if (mText.Length <= mIdx) break;
 
             bool escaped = false;
-            for (int j = mIdx - 1; j > c && mText[j] == '\\'; j++) escaped = !escaped;
+            for (int j = mIdx - 1; j > k && mText[j] == '\\'; j++) escaped = !escaped;
 
             if (!escaped) break; // This is not an escaped '"'. End the loop
-            c = mIdx++;
+            k = mIdx++;
          }
          return mText.Substring (st, mIdx - st);
       }
 
+      /// <summary>Get the string corresponding to the next number in the file, if it exists</summary>
       string GetNumberString () {
          var i = mText.IndexOfAny (Delims, mIdx); if (i == -1) return null;
          var s = mText.Substring (mIdx, i - mIdx);
@@ -78,6 +82,7 @@ namespace JSONTokenizer {
          return null;
       }
 
+      /// <summary>Dictionary holding the metrics for each token</summary>
       public Dictionary<E, int> TokenCount => mDict;
       Dictionary<E, int> mDict;
 
