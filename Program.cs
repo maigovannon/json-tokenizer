@@ -16,11 +16,12 @@ namespace JSONTokenizer {
             Console.WriteLine (token);
          }
 
+         // Output summary
          Console.WriteLine ();
          for (int i = 0; i < 72; i++) Console.Write ('-');
          Console.WriteLine (); Console.WriteLine ();
 
-         foreach (var kvp in tokenizer.TokenCount) Console.WriteLine ($" {kvp.Key.ToString ().PadLeft (Token.StrLen)} | {kvp.Value}");
+         foreach (var kvp in tokenizer.TokenCount) Console.WriteLine ($" {kvp.Key.ToString ().PadLeft (Token.StrMaxLen)} | {kvp.Value}");
          Console.WriteLine ();
       }
    }

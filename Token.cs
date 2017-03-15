@@ -5,6 +5,7 @@ namespace JSONTokenizer {
    public class Token {
       public Token (E kind, object value) { Kind = kind; Value = value; }
 
+      /// <summary>The various types of tokens </summary>
       public enum E {
          Punctuation,
          String,
@@ -13,9 +14,9 @@ namespace JSONTokenizer {
          Invalid,
       }
 
-      public override string ToString () => $"{Kind.ToString ().PadRight (StrLen)}: {Value}";
+      public override string ToString () => $"{Kind.ToString ().PadRight (StrMaxLen)}: {Value}";
 
-      public static readonly int StrLen = E.Punctuation.ToString ().Length;
+      public static readonly int StrMaxLen = E.Punctuation.ToString ().Length;
 
       public readonly E Kind;
       public readonly object Value;
